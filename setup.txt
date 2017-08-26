@@ -1,0 +1,13 @@
+SETUP
+to get the database stuff to work go to server explorer 
+	add a new connection
+	microsoft sql server
+	address = (localdb)\MSSQLLocalDB
+	database = master
+
+now recreate the tables.
+
+	their schema is as follows:
+	TODO
+
+
