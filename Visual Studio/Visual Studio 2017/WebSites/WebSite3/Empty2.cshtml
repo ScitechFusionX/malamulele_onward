@@ -1,0 +1,46 @@
+﻿@{
+    Layout = null;
+
+    var appData = Server.MapPath("~/App_Data");
+    var originalFileName = "expense_report.xls";
+    var newFileName = string.Format("{0}.xls", Guid.NewGuid().ToString());
+    var originalFile = Path.Combine(appData, originalFileName);
+    var newFile = Path.Combine(appData, newFileName);
+    File.Copy(originalFile, newFile);
+
+    var connectionString = "Data Source = (localdb)\\MSSQLLocalDB; Database=master";
+
+    var providerName = "System.Data.SqlClient";
+    var db = Database.OpenConnectionString(connectionString, providerName);
+
+    //var northwind = Database.Open("Northwind");
+    var sql = "SELECT item, price, justification, date FROM expenses";
+    var expenses = db.Query(sql);
+
+    var connString = string.Format(@"Provider=Microsoft.Jet.OleDb.4.0;
+                                    Data Source={0}/{1};Extended Properties='Excel 8.0;HDR=Yes;'",
+                                    appData, newFileName);
+    var provider = "System.Data.OleDb";
+
+    using (var excel = Database.OpenConnectionString(connString, provider))
+    {
+
+        sql = "INSERT INTO Sheet1 (item, price, justification, date) VALUES(@0, @1, @2, @3)";
+
+        foreach (var expense in expenses)
+        {
+            var b = excel.Execute("SELECT * from [Sheet1$]");
+            System.Diagnostics.Debug.WriteLine("LOOK HERE");
+            System.Diagnostics.Debug.WriteLine(b);
+            excel.Execute(sql, expense.item, expense.price, expense.justification, expense.date);
+            excel.Execute(sql,expense.item,expense.price,expense.justification,expense.date);
+        }
+    }
+
+    Response.AddHeader("Content-disposition", "attachment; filename=report.xls");
+    Response.ContentType = "application/octet-stream";
+    Response.TransmitFile(newFile);
+    Response.Flush();
+    File.Delete(newFile);
+    Response.End();
+}

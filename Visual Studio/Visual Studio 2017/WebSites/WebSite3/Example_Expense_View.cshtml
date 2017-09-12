@@ -1,0 +1,143 @@
+﻿@{
+    var connectionString = "Data Source = (localdb)\\MSSQLLocalDB; Database=master";
+
+    var providerName = "System.Data.SqlClient";
+    var db = Database.OpenConnectionString(connectionString, providerName);
+
+    var filter = "";
+    var criterion = "";
+    var comparator = "";
+    var value = "";
+
+    var shows_data = db.Query("SELECT * FROM expenses");
+
+    if (IsPost)
+    {
+        criterion = Request.Form["criterion"];
+        comparator = Request.Form["comparator"];
+        value = Request.Form["value"];
+        if (value.IsDecimal())
+        {
+            try
+            {
+                shows_data = db.Query($"SELECT * FROM expenses WHERE {criterion} {comparator} {value}");
+            }
+            catch
+            {
+                Page.ClientScript.RegisterStartupScript(GetType(), "hwa", "alert('Invalid Query');", true);
+            }
+
+        }
+        else
+        {
+            try
+            {
+                shows_data = db.Query($"SELECT * FROM expenses WHERE {criterion} {comparator} '{value}'");
+            }
+            catch
+            {
+                Page.ClientScript.RegisterStartupScript(GetType(), "hwa", "alert('Invalid query');", true);
+            }
+
+
+        }
+
+
+    }
+    else
+    {
+        shows_data = db.Query("SELECT * FROM expenses");
+    }
+
+    var shows_grid = new WebGrid(shows_data, selectionFieldName : "custom");
+
+}
+
+}
+
+
+
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "View Expenses";
+}
+
+<HTML>
+
+<!--html starts here-->
+<body >
+    <div id="shows_grid">
+
+        @shows_grid.GetHtml(
+
+        tableStyle: "table",
+        alternatingRowStyle: "alternate",
+        selectedRowStyle: "selected",
+        headerStyle: "header",
+
+        columns: shows_grid.Columns(
+
+            shows_grid.Column("item"),
+            shows_grid.Column("price"),
+            shows_grid.Column("justification"),
+            shows_grid.Column("date"),
+               shows_grid.Column(
+            header: "",
+            format:@<text>@item.GetSelectLink("edit")</text>
+            )
+       )
+       )
+
+       @if (shows_grid.HasSelection)
+       {
+           var book = shows_grid.SelectedRow;
+          
+
+
+
+            @RenderPage("~/Example_Expense_Sheet.cshtml")
+           })
+
+        }
+
+        <div class="form-style-6">
+            <h1>Filter</h1>
+            <form method="post">
+                <fieldset>
+                    <legend>Expense Information</legend>
+                    <p>
+                        <!--
+                    <label for="filter">filter by:</label>
+                    <input type="text" name="filter" value="@Request.Form["filter"]" />
+                    -->
+                        <select name="criterion">
+                            <option value="price">price</option>
+                            <option value="item">name</option>
+                            <option value="date">date</option>
+                        </select>
+
+                        <select name="comparator">
+                            <option value="=">=</option>
+                            <option value=">">></option>
+                            <option value="<"><</option>
+                            <option value=">=">>=</option>
+                            <option value="<="><=</option>
+                        </select>
+
+                        <input type="text" name="value" value="@Request.Form["value"]" />
+                    </p>
+                    <p><input type="submit" name="buttonSubmit" value="Filter" /></p>
+                </fieldset>
+            </form>
+        </div>
+
+    </div>
+</body>
+
+<
+
+
+
+</HTML> <!--html ends here-->
+
+

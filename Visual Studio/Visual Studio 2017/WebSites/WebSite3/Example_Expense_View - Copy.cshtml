@@ -1,0 +1,202 @@
+﻿
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "View Expenses";
+}
+
+@using System.Text.RegularExpressions;
+@using System.Linq;
+
+@functions
+{
+    string process_query(String filter)
+    {
+        String result = "";
+        String[] terms = Regex.Split(filter, "([=><])+");
+        String term1 = process_term(terms[0]);
+        String comparator = process_term(terms[1]);
+        String term2 = process_term(terms[2]);
+
+        result = $" WHERE {term1} {comparator} {term2};";
+        return result;
+    }
+
+
+    string process_term(String term)
+    {
+        String result = "";
+        String[] price_alias = { "COST", "PRICE" };
+        String[] user_alias = { "AGENT", "USER", "SPENDER", "FACILITATOR" };
+        String[] date_alias = { "DATE", "DAY", "TIME"};
+        String[] equal_alias = { "EQUALS", "MORE THAN", "TIME" };
+        String[] more_than_alias = { "EQUALS", "IS EQUAL TO", "IS", "IS THE SAME AS", "=", "==" };
+        String[] less_than_alias = { "LESS THAN", "IS LESS THAN", "<" };
+
+        if (price_alias.Contains(term.ToUpper()) )
+        {
+            result = "price";
+        }
+        else if(user_alias.Contains(term.ToUpper()))
+        {
+            result = "user";
+        }else if (equal_alias.Contains(term.ToUpper()))
+        {
+            result = "=";
+        }
+        else if (more_than_alias.Contains(term.ToUpper()))
+        {
+            result = ">";
+        }
+        else if (less_than_alias.Contains(term.ToUpper()))
+        {
+            result = "<";
+        }
+        else if (date_alias.Contains(term.ToUpper()))
+        {
+            result = "date";
+        }
+
+        return result;
+    }
+
+        }
+
+<script type="text/javascript">
+        $(function alert_query() {
+            alert("Invalid Query");
+        }
+</script>
+
+
+
+@{
+    //var filter = "";
+    var criterion = "";
+    var comparator = "";
+    var value = "";
+
+    var connectionString = "Data Source = (localdb)\\MSSQLLocalDB; Database=master";
+    var providerName = "System.Data.SqlClient";
+    var db = Database.OpenConnectionString(connectionString, providerName);
+
+    var shows_data = db.Query("SELECT * FROM expenses");
+
+    if (IsPost)
+    {
+        criterion = Request.Form["criterion"];
+        comparator = Request.Form["comparator"];
+        value = Request.Form["value"];
+        if (value.IsDecimal())
+        {
+            try
+            {
+                shows_data = db.Query($"SELECT * FROM expenses WHERE {criterion} {comparator} {value}");
+            }
+            catch
+            {
+                Page.ClientScript.RegisterStartupScript(GetType(), "hwa", "alert('Invalid Query');", true);
+            }
+
+        }
+        else
+        {
+            try
+            {
+                shows_data = db.Query($"SELECT * FROM expenses WHERE {criterion} {comparator} '{value}'");
+            }
+            catch
+            {
+                Page.ClientScript.RegisterStartupScript(GetType(), "hwa", "alert('Invalid query');", true);
+            }
+
+
+        }
+
+
+    }
+    else
+    {
+        shows_data = db.Query("SELECT * FROM expenses WHERE enabled != 0");
+    }
+
+    var shows_grid = new WebGrid(source: shows_data);
+   
+}
+    
+
+<HTML>
+
+<!--html starts here-->
+<body >
+    <div id="gridContainer">
+        <div id="grid">
+            @shows_grid.GetHtml(
+            columns: shows_grid.Columns(
+            shows_grid.Column("item"),
+            shows_grid.Column("price"),
+            shows_grid.Column("justification"),
+            shows_grid.Column("date"),
+            shows_grid.Column(format: @<a href="~/delete_expense.cshtml?id=@item.ID">Delete</a>),
+            shows_grid.Column(format: @<a href="~/update_expense.cshtml?id=@item.ID">Edit</a>)
+                )
+            )
+        </div>
+
+        <img src="~/Images/orderedList0.png" id="excel" alt="Export to Excel" title="Export to Excel" onclick="function"/>
+
+        <div class="form-style-6">
+            <h1>Filter</h1>
+            <form method="post">
+                <fieldset>
+                    <legend>Expense Information</legend>
+                    <p>
+                        <!-- 
+                        <label for="filter">filter by:</label>
+                        <input type="text" name="filter" value="@Request.Form["filter"]" />
+                        -->
+                        <select name="criterion">
+                            <option value="price">price</option>
+                            <option value="item">name</option>
+                            <option value="date">date</option>
+                        </select>
+
+                        <select name="comparator">
+                            <option value="=">=</option>
+                            <option value=">">></option>
+                            <option value="<"><</option>
+                            <option value=">=">>=</option>
+                            <option value="<="><=</option>
+                        </select>
+
+                        <input type="text" name="value" value="@Request.Form["value"]" />
+                    </p>
+                    <p><input type="submit" name="buttonSubmit" value="Filter" /></p>
+                </fieldset>
+            </form>
+        </div>
+   
+
+     </div>
+</body>
+
+
+</HTML> <!--html ends here-->
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#excel').click(function () {
+                $('<iframe src="/generate_expense_report.cshtml"></iframe>').appendTo('body').hide();
+            });
+        });        
+    </script>
+
+    <script>
+        function do_check(chk)
+        {
+            
+        }
+    </script>
+
+
+}

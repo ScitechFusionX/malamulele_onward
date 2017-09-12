@@ -1,0 +1,332 @@
+﻿@{
+    Page.Title = "Home Visit";
+    //Layout = "Your Layout Page goes here";
+}
+
+@{
+    var child = "";
+    var agent = "";
+    var site = "";
+    var carer = "";
+    var WhatisChilddoing = "";
+    var description = "";
+
+    var present = "";
+    var conditionChildsCarrer = "";
+    var WhereIsChild = "";
+    var level = "";
+    var health= "";
+    var age = "";
+    var planforfamily = "";
+    var condition = "";
+    var filter = "";
+    var criterion = "";
+
+    if (IsPost)
+    {
+        criterion = Request.Form["criterion"];
+
+        agent = Request.Form["agent"];
+        site = Request.Form["site"];
+        child = Request.Form["child"];
+
+
+        age = Request.Form["age"];
+        level = Request.Form["level"];
+        carer = Request.Form["carer"];
+        present = Request.Form["present"];
+        conditionChildsCarrer = Request.Form["conditionChildsCarrer"];
+        WhereIsChild = Request.Form["WhereIsChild"];
+        WhatisChilddoing= Request.Form["WhatisChilddoing"];
+        condition = Request.Form["condition"];
+        health = Request.Form["health"];
+        description = Request.Form["description"];
+        planforfamily = Request.Form["planforfamily"];
+
+
+        var connectionString = "Data Source = (localdb)\\MSSQLLocalDB; Database=master";
+
+        var providerName = "System.Data.SqlClient";
+
+        var dbb = Database.OpenConnectionString(connectionString, providerName);
+        var insertCommand = "INSERT INTO home(agent, site, child, age, level, carer, present, conditionChildsCarrer, WhereIsChild, WhatisChilddoing, condition, health, description, planforfamily) VALUES(@0, @1, @2, @3, @4, @5, @6, @7, @8, @9, @10, @11, @12, @13)";
+
+        dbb.Execute(insertCommand, agent, site ,child, age, level, carer, present, conditionChildsCarrer, WhereIsChild, WhatisChilddoing, condition, health, description, planforfamily);
+
+    }
+}
+
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "log an expense";
+}
+
+<!--<style type="text/css">
+    .form-style-6 {
+        font: 95% Arial, Helvetica, sans-serif;
+        max-width: 400px;
+        margin: 10px auto;
+        padding: 16px;
+        background: #F7F7F7;
+    }
+
+        .form-style-6 h1 {
+            background: #43D1AF;
+            padding: 20px 0;
+            font-size: 140%;
+            font-weight: 300;
+            text-align: center;
+            color: #fff;
+            margin: -16px -16px 16px -16px;
+        }
+
+        .form-style-6 input[type="text"],
+        .form-style-6 input[type="date"],
+        .form-style-6 input[type="datetime"],
+        .form-style-6 input[type="email"],
+        .form-style-6 input[type="number"],
+        .form-style-6 input[type="search"],
+        .form-style-6 input[type="time"],
+        .form-style-6 input[type="url"],
+        .form-style-6 textarea,
+        .form-style-6 select {
+            -webkit-transition: all 0.30s ease-in-out;
+            -moz-transition: all 0.30s ease-in-out;
+            -ms-transition: all 0.30s ease-in-out;
+            -o-transition: all 0.30s ease-in-out;
+            outline: none;
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            width: 100%;
+            background: #fff;
+            margin-bottom: 4%;
+            border: 1px solid #ccc;
+            padding: 3%;
+            color: #555;
+            font: 95% Arial, Helvetica, sans-serif;
+        }
+
+            .form-style-6 input[type="text"]:focus,
+            .form-style-6 input[type="date"]:focus,
+            .form-style-6 input[type="datetime"]:focus,
+            .form-style-6 input[type="email"]:focus,
+            .form-style-6 input[type="number"]:focus,
+            .form-style-6 input[type="search"]:focus,
+            .form-style-6 input[type="time"]:focus,
+            .form-style-6 input[type="url"]:focus,
+            .form-style-6 textarea:focus,
+            .form-style-6 select:focus {
+                box-shadow: 0 0 5px #43D1AF;
+                padding: 3%;
+                border: 1px solid #43D1AF;
+            }
+
+        .form-style-6 input[type="submit"],
+        .form-style-6 input[type="button"] {
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            width: 100%;
+            padding: 3%;
+            background: #43D1AF;
+            border-bottom: 2px solid #30C29E;
+            border-top-style: none;
+            border-right-style: none;
+            border-left-style: none;
+            color: #fff;
+        }
+
+            .form-style-6 input[type="submit"]:hover,
+            .form-style-6 input[type="button"]:hover {
+                background: #2EBC99;
+            }
+</style>
+    -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Home Visit</title>
+</head>
+<body>
+    <div class="form-style-6">
+        <h1> Home Visit Report</h1>
+        <form method="post">
+            <fieldset>
+                <legend>Home Visit Information</legend>
+                <p>
+                    <label for="agent">Parent Facilitator:</label>
+                    <input type="text" name="agent" value="@Request.Form["agent"]" />
+                </p>
+
+                <p>
+                    <label for="site">Site:</label>
+                    <input type="text" name="site" value="@Request.Form["site"]" />
+
+
+
+
+                </p>
+
+                <p>
+                    <label for="child">Child's Name:</label>
+                    <input type="text" name="child" value="@Request.Form["child"]" />
+                </p>
+                <p>
+                    <label for="age">Child's Age:</label>
+                    <input type="text" name="age" value="@Request.Form["age"]" />
+                </p>
+                <p>
+                    <label for="level">Child's GMFCS level:</label>
+
+                    <select name="level">
+                        <option value="@Request.Form["level"]">1</option>
+                        <option value="@Request.Form["level"]">2</option>
+                        <option value="@Request.Form["level"]">3</option>
+                        <option value="@Request.Form["level"]">4</option>
+                        <option value="@Request.Form["level"]">5</option>
+                    </select> 
+
+               
+
+             </p>
+
+        <p>
+            <label for="carer">Child's main carer?:</label>
+            <select name="carer"  onchange="showfield1(this.options[this.selectedIndex].value)">
+                <option value="@Request.Form["carer"]">Mother</option>
+                <option value="@Request.Form["carer"]">Father</option>
+                <option value="@Request.Form["carer"]">Paternal Grandmother</option>
+                <option value="@Request.Form["carer"]">Paternal Grandfather</option>
+                <option value="@Request.Form["carer"]">Maternal GrandMother</option>
+                <option value="@Request.Form["carer"]">Maternal Grandfather</option>
+                <option value="@Request.Form["carer"]">Aunt</option>
+                <option value="@Request.Form["carer"]">Cousin</option> 
+                <option value="@Request.Form["carer"]">Sibling</option>
+                <option value="@Request.Form["carer"]">Paid Carer</option>
+                <option value="@Request.Form["carer"]">Other</option>
+
+            </select> 
+            <div id="div1"></div>
+        </p>
+
+        <p>
+            <label for="present">Is the child's carer present?:</label>
+            <select name="present">
+                <option value="@Request.Form["present"]">Yes</option>
+                <option value="@Request.Form["present"]">No</option>
+
+            </select>
+        </p>
+
+        <p>
+            <label for="conditionChildsCarrer">How is the child's carer:</label>
+            <select name="conditionChildsCarrer"  onchange="showfield2(this.options[this.selectedIndex].value)">
+                <option value="@Request.Form["conditionChildsCarrer"]">Happy</option>
+                <option value="@Request.Form["conditionChildsCarrer"]">Sad</option>
+                <option value="@Request.Form["conditionChildsCarrer"]">Worried and anxious</option>
+                <option value="@Request.Form["conditionChildsCarrer"]">Other</option>
+
+            </select>
+            <div id="div2"></div>
+        </p>
+        <p>
+            <label for="WhereIsChild">Where is the child?:</label>
+            <select name="WhereIsChild">
+                <option value="@Request.Form["WhereIsChild"]">Child is inside the house</option>
+                <option value="@Request.Form["WhereIsChild"]">Child is outside the house</option>
+                
+            </select> 
+        </p>
+
+        <p>
+            <label for="WhatisChilddoing">What is the child doing?:</label>
+            <select name="WhatisChilddoing" onchange="showfield3(this.options[this.selectedIndex].value)">
+                <option value="@Request.Form["WhatisChilddoing"]">Child is lying down on the floor or on the bed</option>
+                <option value="@Request.Form["WhatisChilddoing"]">Child is sitting in a buggy / wheelchair / sofa but the position is poor</option>
+                <option value="@Request.Form["WhatisChilddoing"]">Child is sitting in a buggy / wheelchair / sofa and the position is good</option>
+                <option value="@Request.Form["WhatisChilddoing"]">Child is sitting on the ground playing in a poor position</option>
+                <option value="@Request.Form["WhatisChilddoing"]">Child is sitting on the ground playing in a good position</option>
+                <option value="@Request.Form["WhatisChilddoing"]">Child is moving about (crawling, walking) and playing</option>
+                <option value="@Request.Form["WhatisChilddoing"]">Other</option>
+
+
+            </select>
+            <div id="div3"></div>
+            
+        </p>
+        <p>
+            <label for="condition">What is the condition of the child?:</label>
+            <select name="condition"  onchange="showfield4(this.options[this.selectedIndex].value)">
+                <option value="@Request.Form["condition"]">Child is clean and nicely dressed</option>
+                <option value="@Request.Form["condition"]">Child is dirty and the clothes are dirty; there are flies on the child</option>
+                <option value="@Request.Form["condition"]">Other</option>
+
+            </select>
+            <div id="div4"></div>
+            
+        </p>
+
+        <p>
+            <label for="health">Is the child healthy?:</label>
+            <select name="health"  onchange="showfield5(this.options[this.selectedIndex].value)">
+                <option value="@Request.Form["health"]">Child looks healthy</option>
+                <option value="@Request.Form["health"]">Child looks ill </option>
+              
+
+            </select>
+            <div id="div5"></div>
+        </p>
+
+
+
+        <p>
+            <label for="description">What did you do today?:</label>
+            <input type="text" name="description" value="@Request.Form["description"]" />
+        </p>
+
+        <p>
+            <label for="planforfamily">What is my plan and what needs to be followed up?:</label>
+            <input type="text" name="planforfamily" value="@Request.Form["planforfamily"]" />
+        </p>
+
+
+        <p><input type="submit" name="buttonSubmit" value="Submit" /></p>
+        </fieldset>
+        </form>
+    </div>
+</body>
+</html>
+
+<script type="text/javascript">
+
+
+
+    function showfield1(name) {  
+        if (name == 'Other') document.getElementById('div1').innerHTML = 'Other: <input type="text" name="carer" placeholder = "please specify" />';
+        else document.getElementById('div1').innerHTML = '';
+    }
+
+    function showfield2(name) {
+        if (name == 'Other') document.getElementById('div2').innerHTML = 'Other: <input type="text" name="conditionChildsCarrer" placeholder = "please specify"/>';
+        else document.getElementById('div2').innerHTML = ''; 
+    }
+
+    function showfield3(name) {
+        if (name == 'Other') document.getElementById('div3').innerHTML = 'Other: <input type="text" name="WhatisChilddoing" placeholder = "please specify" />';
+        else document.getElementById('div3').innerHTML = '';
+    }
+
+
+    function showfield4(name) {
+        if (name == 'Other') document.getElementById('div4').innerHTML = 'Other: <input type="text" name="condition" placeholder = "please specify" />';
+        else document.getElementById('div4').innerHTML = '';
+    }
+
+    function showfield5(name) {
+        if (name == 'Child looks ill') document.getElementById('div5').innerHTML = 'Other: <input type="text" name="condition" placeholder = "describe what you see" />';
+        else document.getElementById('div5').innerHTML = '';
+    }
+
+</script>

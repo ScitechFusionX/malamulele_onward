@@ -1,0 +1,41 @@
+﻿@{
+    var connectionString = "Data Source = (localdb)\\MSSQLLocalDB; Database=master";
+
+    var providerName = "System.Data.SqlClient";
+    var db = Database.OpenConnectionString(connectionString, providerName);
+    var shows_data = db.Query("SELECT * FROM home");
+    var shows_grid = new WebGrid(source: shows_data);
+}
+
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "View Home Visits";
+}
+
+<HTML>
+<!--html starts here-->
+<body>
+    @shows_grid.GetHtml(
+        columns: shows_grid.Columns(
+        shows_grid.Column("agent"),
+        shows_grid.Column("site"),
+        shows_grid.Column("child"),
+        shows_grid.Column("age"),
+        shows_grid.Column("level"),
+        shows_grid.Column("carer"),
+        shows_grid.Column("present"),
+        shows_grid.Column("conditionChildsCarrer"),
+        shows_grid.Column("WhereIsChild"),
+        shows_grid.Column("WhatisChilddoing"),
+        shows_grid.Column("condition"),
+        shows_grid.Column("health"),
+        shows_grid.Column("description"),
+        shows_grid.Column("planforfamily")
+                )
+    
+
+                )
+</body>
+
+</HTML> <!--html ends here-->
+

@@ -1,0 +1,94 @@
+﻿@using System.Globalization;
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "time sheet";
+}
+@{
+
+    var task = "";
+    var start_time = "";
+    var end_time = "";
+    var date = "";
+
+    if (IsPost)
+    {
+        System.Diagnostics.Debug.WriteLine("LOOK HERE : STARTING CODE");
+        task = Request.Form["task"];
+        start_time = Request.Form["start_time"];
+        end_time = Request.Form["end_time"];
+        var start_time_d = DateTime.ParseExact(start_time, "HH:mm", CultureInfo.InvariantCulture);
+        var end_time_d = DateTime.ParseExact(end_time, "HH:mm", CultureInfo.InvariantCulture);
+        date = Request.Form["date"];
+        var duration = end_time_d -start_time_d;
+        System.Diagnostics.Debug.WriteLine(start_time_d);
+        System.Diagnostics.Debug.WriteLine(end_time_d);
+        System.Diagnostics.Debug.WriteLine(duration);
+        var connectionString = "Data Source = (localdb)\\MSSQLLocalDB; Database=master";
+        var providerName = "System.Data.SqlClient";
+        //Data Source = (localdb)\MSSQLLocalDB; Initial Catalog = test; Integrated Security = True; Connect Timeout = 30; Encrypt = False; TrustServerCertificate = True; ApplicationIntent = ReadWrite; MultiSubnetFailover = False
+
+        var dbb = Database.OpenConnectionString(connectionString,providerName);
+        var insertCommand = "INSERT INTO tasks (task, start_time, end_time, date, duration) VALUES(@0, @1, @2, @3, @4)";
+        try
+        {
+
+            dbb.Execute(insertCommand, task, start_time, end_time, date, duration);
+        }
+        catch(Exception e)
+        {
+            System.Diagnostics.Debug.WriteLine(e);
+             
+            System.Diagnostics.Debug.WriteLine("LOOK HERE");
+            System.Diagnostics.Debug.WriteLine("LOOK HERE");
+            System.Diagnostics.Debug.WriteLine("LOOK HERE");
+            System.Diagnostics.Debug.WriteLine("LOOK HERE");
+            Response.Redirect("whoops.html");
+
+        }
+
+
+
+
+
+        //ClientScript.RegisterStartupScript(this.GetType(), "myalert", "alert('" + "recorded" + "');", true);
+
+
+        //db.Execute(insertCommand, test);
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Add a Task</title>
+</head>
+<body>
+    <h1>Add a Task</h1>
+    <form method="post">
+        <fieldset>
+            <legend>Task Information</legend>
+            <p>
+                <label for="task">What did you do today:</label>
+                <input type="text" name="task" value="@Request.Form["task"]" />
+            </p>
+
+            <p>
+                <label for="start_time">Start Time:</label>
+                <input type="time"  name="start_time" value="@Request.Form["start_time"]" />
+            </p>
+
+            <p>
+                <label for="end_time">End Time:</label>
+                <input type="time" name="end_time" value="@Request.Form["end_time"]" />
+            </p>
+
+            <p>
+                <label for="date">Date:</label>
+                <input type="date" name="date" value="@Request.Form["date"]"/>
+            </p>
+
+            <p><input type="submit" name="buttonSubmit" value="Add Task" /></p>
+        </fieldset>
+    </form>
+</body>
+</html>

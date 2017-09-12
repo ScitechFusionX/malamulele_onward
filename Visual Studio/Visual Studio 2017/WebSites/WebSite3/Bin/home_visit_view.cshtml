@@ -1,0 +1,32 @@
+﻿@{
+    var connectionString = "Data Source = (localdb)\\MSSQLLocalDB; Database=master";
+
+    var providerName = "System.Data.SqlClient";
+    var db = Database.OpenConnectionString(connectionString, providerName);
+    var shows_data = db.Query("SELECT * FROM tasks");
+    var shows_grid = new WebGrid(source: shows_data);
+}
+
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "View Expenses";
+}
+
+<HTML>
+
+<!--html starts here-->
+<body>
+    @shows_grid.GetHtml(
+        columns: shows_grid.Columns(
+            shows_grid.Column("task"),
+            shows_grid.Column("start_time"),
+            shows_grid.Column("end_time"),
+            shows_grid.Column("duration"),
+            shows_grid.Column("date")
+       )
+    )
+
+
+</body>
+
+</HTML> <!--html ends here-->

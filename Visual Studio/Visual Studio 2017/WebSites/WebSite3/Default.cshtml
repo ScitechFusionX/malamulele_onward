@@ -1,0 +1,84 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "Home";
+}
+
+@section featured {
+<section class="featured">
+    <div class="content-wrapper">
+        <hgroup class="title">
+            <h1>@Page.Title.</h1>
+        </hgroup>
+        <p>
+            this is still a rough draft of what a dashboard/ landing page might look like
+        </p>
+    </div>
+</section>
+}
+
+<h3>Currently functional things</h3>
+
+@if (WebSecurity.IsAuthenticated)
+{
+    <ol class="round">
+        <li class="one">
+            <h5>Expenses input</h5>
+            this is an expense sheet
+            <p>
+                <a href="Example_Expense_Sheet.cshtml"> click here to log a purchase</a>
+            </p>
+        </li>
+        <li class="two">
+            <h5>Expenses output</h5>
+            This is a display for the expenses
+            <p>
+                <a href="~/Example_Expense_View - Copy.cshtml"> click here to see what people have bought</a>
+            </p>
+        </li>
+        <li class="three">
+            <h5>Timesheet input</h5>
+            This is a time sheet
+            <p>
+                <a href="~/Example_time_sheet.cshtml"> click here to log a task</a>
+            </p>
+        </li>
+        <li class="four">
+            <h5>Timesheet output</h5>
+            This is a display for the time sheet
+
+           <p>
+                <a href="~/Example_time_View.cshtml"> click here to see what people have done</a>
+            </p>
+        </li>
+
+        <li class="five">
+            <h5>Home Visit</h5>
+            This is a Home Visit
+
+            <p>
+                <a href="home_visit.cshtml"> click here for a Home Visit Sheet</a>
+            </p>
+        </li>
+        <li class="six">
+            <h5>Home Visit output</h5>
+            This is a Home Visit output
+
+            <p>
+                <a href= "home_visit - Copy.cshtml"> click here for a Home Visit Sheet View</a>
+            </p>
+        </li>
+    </ol>
+}
+else
+{
+    <ol class="round">
+        <li class="one">
+            <h5>Whoops</h5>
+            looks like you need to login
+            <p>
+                <a href="~/Account/Login.cshtml"> click here to login</a>
+            </p>
+            
+        </li>
+    </ol>
+}
