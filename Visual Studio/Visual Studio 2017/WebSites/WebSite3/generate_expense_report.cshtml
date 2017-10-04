@@ -1,14 +1,25 @@
 ﻿@using System.Configuration; 
 @using System.Data.SqlClient;
 @using System.Data;
+@using System.Text.RegularExpressions;
+@using System.Linq;
+
 
 @{
     SqlConnection conn = new SqlConnection("Data Source = (localdb)\\MSSQLLocalDB; Database=master");
+
     DataTable dt = new DataTable();
-    //var connectionString = "Data Source = (localdb)\\MSSQLLocalDB; Database=master";
-    //var providerName = "System.Data.SqlClient";
-    var queryStr = "SELECT * FROM expenses";
-    SqlDataAdapter sda = new SqlDataAdapter(queryStr, conn);
+    var queryString = "SELECT * FROM expenses";
+
+    if(Request.QueryString["query"] != null)
+    {
+        queryString = Request.QueryString["query"];
+
+
+    }
+
+
+    SqlDataAdapter sda = new SqlDataAdapter(queryString, conn);
     sda.Fill(dt);
     string attach = "attachment;filename=report.xls";
     Response.ClearContent();
@@ -24,7 +35,7 @@
         Response.Write(System.Environment.NewLine);
         foreach (DataRow dr in dt.Rows)
         {
-            for (int i = 0; i < dt.Columns.Count; i++)
+            for (int i = 0; i<dt.Columns.Count; i++)
             {
                 Response.Write(dr[i].ToString() + "\t");
             }

@@ -1,0 +1,29 @@
+﻿@{
+    WebSecurity.RequireAuthenticatedUser();
+    var db = Database.Open("StarterSite");
+    var shows_data = db.Query("SELECT * FROM UserProfile");
+    var shows_grid = new WebGrid(source: shows_data);
+}
+
+@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "View Expenses";
+}
+
+<HTML>
+
+<!--html starts here-->
+<body >
+    @shows_grid.GetHtml(
+        columns: shows_grid.Columns(
+            shows_grid.Column("UserID"),
+            shows_grid.Column("Email"),
+            shows_grid.Column(format: @<p>is admin = @Roles.IsUserInRole(item.Email, "admin") </p>),
+            shows_grid.Column(format: @<a href="~/make_admin.cshtml?id=@item.Email">edit admin status</a>)
+       )
+    )
+
+
+</body>
+
+</HTML> <!--html ends here-->

@@ -1,32 +1,148 @@
-﻿@{
-    var connectionString = "Data Source = (localdb)\\MSSQLLocalDB; Database=master";
-
-    var providerName = "System.Data.SqlClient";
-    var db = Database.OpenConnectionString(connectionString, providerName);
-    var shows_data = db.Query("SELECT * FROM tasks");
-    var shows_grid = new WebGrid(source: shows_data);
-}
-
+﻿@using System.Configuration;
+@using System.Data.SqlClient;
+@using System.Data;
 @{
     Layout = "~/_SiteLayout.cshtml";
-    Page.Title = "View Expenses";
+    Page.Title = "View Tasks";
+    WebSecurity.RequireAuthenticatedUser();
 }
+
+@using System.Text.RegularExpressions;
+@using System.Linq;
+
+@{
+    //var filter = "";
+    var criterion = "";
+    var comparator = "";
+    var value = "";
+    var user = WebSecurity.CurrentUserName;
+
+
+    var connectionString = "Data Source = (localdb)\\MSSQLLocalDB; Database=master";
+    SqlConnection conn = new SqlConnection("Data Source = (localdb)\\MSSQLLocalDB; Database=master");
+    var providerName = "System.Data.SqlClient";
+    var db = Database.OpenConnectionString(connectionString, providerName);
+
+    var shows_data = db.Query("SELECT * FROM Tasks");
+    var queryStr = "";
+
+    if (IsPost)
+    {
+        criterion = Request.Form["criterion"];
+        comparator = Request.Form["comparator"];
+        value = Request.Form["value"];
+        try
+        {
+            if (Roles.IsUserInRole("admin"))
+            {
+                shows_data = db.Query($"SELECT * FROM Tasks WHERE {criterion} {comparator} '{value}'");
+                queryStr = $"SELECT * FROM Tasks WHERE {criterion} {comparator} '{value}'";
+            }
+            else
+            {
+                shows_data = db.Query($"SELECT * FROM Tasks WHERE {criterion} {comparator} '{value}' AND enabled != 0 AND agent = {user}");
+                queryStr = $"SELECT * FROM Tasks WHERE {criterion} {comparator} '{value}' AND enabled != 0 AND agent = {user}";
+            }
+
+        }
+        catch
+        {
+            Page.ClientScript.RegisterStartupScript(GetType(), "hwa", "alert('Invalid query');", true);
+        }
+    }
+    else
+    {
+        if (Roles.IsUserInRole(user, "admin"))
+        {
+            shows_data = db.Query($"SELECT * FROM Tasks WHERE enabled != 0");
+            queryStr = "SELECT * FROM Tasks WHERE enabled != 0";
+        }
+        else
+        {
+            shows_data = db.Query($"SELECT * FROM Tasks WHERE enabled != 0 AND agent = '{user}'");
+            queryStr = "SELECT * FROM Tasks WHERE enabled != 0 AND agent = '{user}'";
+        }
+
+    }
+
+    var shows_grid = new WebGrid(source: shows_data);
+
+    @section scripts{
+        <script type="text/javascript">
+        $(function () {
+            $('#excel').click(function () {
+
+
+                   $('<iframe src="generate_expense_report.cshtml?query=@queryStr"></iframe>').appendTo('body').hide();
+
+                });
+            });
+        </script>
+
+
+
+    }
+
+}
+
 
 <HTML>
 
 <!--html starts here-->
-<body >
-    @shows_grid.GetHtml(
-        columns: shows_grid.Columns(
+<body>
+    <div id="gridContainer">
+        <div id="grid">
+            @shows_grid.GetHtml(
+            columns: shows_grid.Columns(
             shows_grid.Column("task"),
             shows_grid.Column("start_time"),
             shows_grid.Column("end_time"),
+            shows_grid.Column("date"),
             shows_grid.Column("duration"),
-            shows_grid.Column("date")
-       )
-    )
+            shows_grid.Column("agent"),
+            shows_grid.Column(format: @<a href="~/delete_expense.cshtml?id=@item.ID">Delete</a>),
+            shows_grid.Column(format: @<a href="~/update_expense.cshtml?id=@item.ID">Edit</a>)
+                )
+            )
+        </div>
+
+        <img src="~/Images/orderedList1.png" id="excel" alt="Export to Excel" title="Export to Excel" onclick="function" />
 
 
+        <div class="form-style-6">
+            <h1>Filter</h1>
+            <form method="post">
+                <fieldset>
+                    <legend>Task Information</legend>
+                    <p>
+                        <!--
+                        <label for="filter">filter by:</label>
+                        <input type="text" name="filter" value="@Request.Form["filter"]" />
+                        -->
+                        <select name="criterion">
+                            <option value="task">task</option>
+                            <option value="date">date</option>
+                            <option value="agent">agent</option>
+                        </select>
+
+                        <select name="comparator">
+                            <option value="=">=</option>
+                            <option value=">">></option>
+                            <option value="<"><</option>
+                            <option value=">=">>=</option>
+                            <option value="<="><=</option>
+                        </select>
+
+                        <input type="text" name="value" value="@Request.Form["value"]" />
+                    </p>
+                    <p><input type="submit" name="buttonSubmit" value="Filter" /></p>
+                </fieldset>
+            </form>
+        </div>
+
+
+    </div>
 </body>
+
 
 </HTML> <!--html ends here-->

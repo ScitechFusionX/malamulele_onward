@@ -1,0 +1,100 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "time sheet";
+}
+
+@{
+    var item = "";
+    decimal price = 0;
+    var justification = "";
+    DateTime date = new DateTime();
+
+    var expense_id = "";
+
+    if (!IsPost)
+    {
+        if (!Request.QueryString["ID"].IsEmpty() && Request.QueryString["ID"].IsInt())
+        {
+            expense_id = Request.QueryString["ID"];
+            var connectionString = "Data Source = (localdb)\\MSSQLLocalDB; Database=master";
+            var providerName = "System.Data.SqlClient";
+            var db = Database.OpenConnectionString(connectionString, providerName);
+            var dbCommand = "SELECT * FROM Tasks WHERE ID = @0";
+            var row = db.QuerySingle(dbCommand, expense_id);
+            if (row != null)
+            {
+                item = row.item;
+                price = row.price;
+                justification = row.justification;
+                date = row.date;
+            }
+            else
+            {
+                Validation.AddFormError("No task was found for that ID.");
+            }
+        }
+        else
+        {
+            Validation.AddFormError("No task was found for that ID.");
+        }
+    }
+
+    if (IsPost && !Request["buttonDelete"].IsEmpty())
+    {
+        expense_id = Request.Form["expense_id"];
+        var connectionString = "Data Source = (localdb)\\MSSQLLocalDB; Database=master";
+        var providerName = "System.Data.SqlClient";
+        var db = Database.OpenConnectionString(connectionString, providerName);
+
+        var s_item = Request.Form["item"];
+        var s_price = Request.Form["price"].Replace(',','.');
+        var s_justification = Request.Form["reason"];
+
+        //TODO: keep old date if date is unchanged
+        var s_date = Request.Form["date"];
+
+        var updateCommand = "UPDATE expenses SET item = @0, price = @1, justification = @2, date = @3 WHERE ID = @4;";
+        db.Execute(updateCommand, s_item, s_price, s_justification, s_date, expense_id);
+        Response.Redirect("~/Example_Expense_View - Copy.cshtml");
+    }
+}
+<html>
+<head>
+    <title>Delete an Expense</title>
+</head>
+<body>
+    <h1>Delete an Expense</h1>
+    @Html.ValidationSummary()
+    <p><a href="~/Example_Expense_View - Copy.cshtml">Return to expense listing</a></p>
+
+    <form method="post">
+        <fieldset>
+            <legend>Expense Information</legend>
+            <p>
+                <label for="title">Item:</label>
+                <input type="text" name="item" value="@item" />
+            </p>
+
+            <p>
+                <label for="price">Price:</label>
+                <input type="text" name="price" value="@price" />
+            </p>
+
+            <p>
+                <label for="reason">Justification:</label>
+                <input type="text" name="reason" value="@justification" />
+            </p>
+
+            <p>
+                <label for="date">Date of Purchase:</label>
+                <input type="date" name="date" value="@date" />
+            </p>
+          
+
+            <input type="hidden" name="expense_id" value="@expense_id" />
+            <p><input type="submit" name="buttonDelete" value="Update Expense" /></p>
+        </fieldset>
+        <p><a href="~/Example_Expense_View - Copy.cshtml">Return to expenses listing</a></p>
+    </form>
+</body>
+</html>

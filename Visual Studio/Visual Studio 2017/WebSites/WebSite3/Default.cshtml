@@ -20,6 +20,15 @@
 
 @if (WebSecurity.IsAuthenticated)
 {
+
+    if (Roles.GetRolesForUser(WebSecurity.CurrentUserName).Contains("agent"))
+    {
+        <h5>Running as Agent</h5>
+    }
+    else
+    {
+        <h5>Running as Admin</h5>
+    }
     <ol class="round">
         <li class="one">
             <h5>Expenses input</h5>
@@ -67,7 +76,20 @@
                 <a href= "home_visit - Copy.cshtml"> click here for a Home Visit Sheet View</a>
             </p>
         </li>
+        @if (Roles.GetRolesForUser(WebSecurity.CurrentUserName).Contains("admin"))
+        {
+        <li class="seven">
+            <h5>User view</h5>
+            This page to edit user permissions
+
+            <p>
+                <a href="~/Example_User_View.cshtml"> click here for a User View</a>
+            </p>
+        </li>
+        }
     </ol>
+
+    
 }
 else
 {

@@ -1,0 +1,111 @@
+﻿@{
+    Layout = "~/_SiteLayout.cshtml";
+    Page.Title = "time sheet";
+    WebSecurity.RequireAuthenticatedUser();
+}
+
+@{
+    WebSecurity.RequireAuthenticatedUser();
+    WebSecurity.RequireRoles(new String[] {"admin"}) ;
+    var email = "";
+    var user_email = "";
+
+    if (!IsPost)
+    {
+        if (!Request.QueryString["ID"].IsEmpty())
+        {
+            user_email = Request.QueryString["ID"];
+            var db = Database.Open("StarterSite");
+
+            var dbCommand = "SELECT * FROM UserProfile WHERE Email = @0";
+            var row = db.QuerySingle(dbCommand, user_email);
+            if (row != null)
+            {
+                email = row.Email;
+
+            }
+            else
+            {
+                Validation.AddFormError("No expense was found for that ID.");
+            }
+        }
+        else
+        {
+            Validation.AddFormError("No expense was found for that ID.");
+        }
+    }
+
+    if (IsPost && !Request["buttonUpgrade"].IsEmpty())
+    {
+        user_email = Request.Form["expense_id"];
+        var db = Database.Open("StarterSite");
+        try
+        {
+            Roles.AddUserToRole(user_email, "admin");
+        }
+        catch(Exception e)
+        {
+            Response.Redirect("~/Example_User_View.cshtml");
+        }
+
+        Response.Redirect("~/Example_User_View.cshtml");
+
+    }
+    else if (IsPost && !Request["buttonDelete"].IsEmpty())
+    {
+        user_email = Request.Form["expense_id"];
+        var db = Database.Open("StarterSite");
+        try
+        {
+            Roles.RemoveUserFromRole(user_email, "admin");
+        }
+        catch (Exception e)
+        {
+            Response.Redirect("~/Example_User_View.cshtml");
+        }
+
+        Response.Redirect("~/Example_User_View.cshtml");
+
+    }
+}
+<html>
+<head>
+    <title>Make an Admin</title>
+</head>
+<body>
+    <h1>Make an Admin</h1>
+    @Html.ValidationSummary()
+    <p><a href="~/Example_User_View.cshtml">Return to users listing</a></p>
+
+    <form method="post">
+        <fieldset>
+            <legend>Expense Information</legend>
+
+            <p>
+                <span>Email:</span>
+                <span>@email</span>
+            </p>
+
+            <p>
+                <span>admin status:</span>
+                <span>@Roles.GetRolesForUser(email).Contains("admin").ToString()</span>
+            </p>
+
+
+            <input type="hidden" name="expense_id" value="@user_email" />
+
+            @if (Roles.IsUserInRole(email, "admin"))
+            {
+                <p><input type="submit" name="buttonDelete" value="Make user agent" /></p>
+            }
+            else
+            {
+                <p><input type="submit" name="buttonUpgrade" value="Make user admin" /></p>
+            }
+
+            
+        </fieldset>
+        <p><a href="~/Example_User_View.cshtml">Return to users listing</a></p>
+    </form>
+</body>
+</html>
